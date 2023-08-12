@@ -49,7 +49,8 @@ def populate_spells():
             healing = heal_at_slot_level[0]
         else:
             healing = None
-        # import ipdb; ipdb.set_trace()
+        
+        class_list = ", ".join([cls['name'] for cls in spell_data['classes']])
 
         
         school = spell_data['school']['name']        
@@ -66,13 +67,13 @@ def populate_spells():
             duration = spell_data['duration'],
             concentration = int(spell_data['concentration']),
             casting_time = spell_data['casting_time'],
-            # damage is a stretch goal, there's a lot of nested JSON to navigate
             school = school,
             damage_type = damage_type,
             damage = damage,
-            healing = healing
+            healing = healing,
+            classes = class_list
         )
-        print(new_spell.healing)
+        print(new_spell.classes)
         session.add(new_spell)
         session.commit()
     print(session.query(Spell).count(), " Spells seeded successfully 🌱")

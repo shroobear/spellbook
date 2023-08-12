@@ -24,6 +24,7 @@ class Spell(Base):
     damage_type = Column(String)
     school = Column(String)
     healing = Column(String)
+    classes = Column(String)
     spellbooks = relationship("Spellbook", back_populates='spell')
     
 
@@ -41,8 +42,10 @@ class Spell(Base):
             + f"Concentration: {self.concentration}\n" \
             + f"Casting Time: {self.casting_time}\n" \
             + f"Damage: {self.damage} {self.damage_type} damage\n" \
+            + f"Healing: {self.healing}\n" \
+            + f"Classes: {self.classes}\n" \
             + f"School: {self.school}" \
-        
+               
 
 class User(Base):
     __tablename__ = 'user'

@@ -9,4 +9,6 @@ engine = create_engine("sqlite:///spell.db")
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# from seed import populate_spells, populate_user, populate_character, assign_spells
+
 ipdb.set_trace()
