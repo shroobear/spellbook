@@ -24,20 +24,36 @@ def clear_table(table_class):
 
 def populate_spells():
     clear_table(Spell)
+    print("Seeding Spells 🪄")
 
     for entry in spells:
         r = requests.get(f"http://www.dnd5eapi.co{entry['url']}")
         spell_data = r.json()
 
         material = spell_data.get('material', None)
-        # damage_type = spell_data['damage']['damage_type']['name']
-        school = spell_data['school']['name']
+        if spell_data.get('damage'):
+            if 'damage_type' in spell_data['damage']:
+                damage_type = spell_data['damage']['damage_type']['name']
+            else:
+                damage_type = "TBD"
+            if 'damage_at_slot_level' in spell_data['damage']:
+                damage_at_slot_level = spell_data['damage']['damage_at_slot_level']
+                first_dice_value = list(damage_at_slot_level.values())[0]
+                damage = first_dice_value
+            else:
+                damage = None
+        else:
+            damage_type = None
+        if spell_data.get('heal_at_slot_level'):
+            heal_at_slot_level = list(spell_data['heal_at_slot_level'].values())
+            healing = heal_at_slot_level[0]
+        else:
+            healing = None
         # import ipdb; ipdb.set_trace()
-        casting_level = int(spell_data['level'])
-        
 
-        # import ipdb; ipdb.set_trace()
-        print("Seeding Spells 🪄")
+        
+        school = spell_data['school']['name']        
+
         new_spell = Spell(
             name = spell_data['name'],
             description = '/n'.join(spell_data['desc']),
@@ -50,18 +66,21 @@ def populate_spells():
             duration = spell_data['duration'],
             concentration = int(spell_data['concentration']),
             casting_time = spell_data['casting_time'],
-            # damage_type = damage_type,
             # damage is a stretch goal, there's a lot of nested JSON to navigate
-            school = school
+            school = school,
+            damage_type = damage_type,
+            damage = damage,
+            healing = healing
         )
-        print(new_spell.name, new_spell.casting_level)
+        print(new_spell.healing)
         session.add(new_spell)
         session.commit()
-    print(session.query(Spell)[-1], " Spells seeded successfully")
+    print(session.query(Spell).count(), " Spells seeded successfully 🌱")
 
 
 def populate_user():
     clear_table(User)
+    print("Seeding users 👥")
 
     Faker.seed(0)
     for _ in range(10):
@@ -73,9 +92,11 @@ def populate_user():
         )
         session.add(new_user)
     session.commit()
+    print("Users seeded successfully 🌱")
 
 def populate_character():
     clear_table(Character)
+    print("Seeding characters 🧌")
 
     Faker.seed(0)
     for _ in range(25):
@@ -87,9 +108,11 @@ def populate_character():
         session.add(new_character)
 
     session.commit()
+    print("Characters seeded successfully 🌱")
 
 def assign_spells():
-    # clear_table(Spellbook)
+    clear_table(Spellbook)
+    print("Learning Spells 📖")
     spell_count = session.query(Spell).count()
     character_count = session.query(Character).count()
 
@@ -104,10 +127,9 @@ def assign_spells():
         session.add(learned_spell)
     
     session.commit()
+    print("Spellbooks seeded successfully 🌱")
 
-
-import ipdb; ipdb.set_trace()
-# populate_spells()
-# populate_user()
-# populate_character()
-# assign_spells()
+populate_spells()
+populate_user()
+populate_character()
+assign_spells()
