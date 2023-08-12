@@ -20,12 +20,15 @@ class Spell(Base):
     duration = Column(String)
     concentration = Column(Integer)
     casting_time = Column(String)
+    damage = Column(String)
     damage_type = Column(String)
     school = Column(String)
+    healing = Column(String)
     spellbooks = relationship("Spellbook", back_populates='spell')
+    
 
     def __repr__(self):
-        return f"Spell(id={self.id} \n" \
+        return f"Spell id: {self.id} \n" \
             + f"Name: {self.name}\n" \
             + f"Description: \n{self.description}\n" \
             + f"Casting Level: {self.casting_level}\n" \
@@ -37,7 +40,7 @@ class Spell(Base):
             + f"Duration: {self.duration}\n" \
             + f"Concentration: {self.concentration}\n" \
             + f"Casting Time: {self.casting_time}\n" \
-            + f"Damage Type: {self.damage_type})" \
+            + f"Damage: {self.damage} {self.damage_type} damage\n" \
             + f"School: {self.school}" \
         
 
