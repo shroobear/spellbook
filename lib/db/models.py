@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -12,6 +12,7 @@ class Spell(Base):
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     casting_level = Column(Integer, nullable=False)
+    higher_level = Column(String)
     components = Column(String)
     range = Column(String)
     material = Column(String)
@@ -22,6 +23,23 @@ class Spell(Base):
     damage_type = Column(String)
     school = Column(String)
 
+    def __repr__(self):
+        return f"Spell(id={self.id} \n" \
+            + f"Name: {self.name}\n" \
+            + f"Description: \n{self.description}\n" \
+            + f"Casting Level: {self.casting_level}\n" \
+            + f"Higher Level: {self.higher_level}\n" \
+            + f"Components: {self.components}\n" \
+            + f"Range: {self.range}\n" \
+            + f"Material: {self.material}\n" \
+            + f"Ritual: {self.ritual}\n" \
+            + f"Duration: {self.duration}\n" \
+            + f"Concentration: {self.concentration}\n" \
+            + f"Casting Time: {self.casting_time}\n" \
+            + f"Damage Type: {self.damage_type})" \
+            + f"School: {self.school}" \
+        
+
 class User(Base):
     __tablename__ = 'user'
 
@@ -30,6 +48,11 @@ class User(Base):
     username = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    characters = relationship('Character', backref = "user")
+
+    def __repr__(self):
+        return f"User(id={self.id} " \
+            + f"Name: {self.first_name} {self.last_name})"
 
 class Character(Base):
     __tablename__ = 'character'
@@ -38,4 +61,14 @@ class Character(Base):
 
     name = Column(String, nullable=False)
     level = Column(Integer)
-    user_id = relationship('User', backref='character')
+    user_id = Column(Integer, ForeignKey('user.id'))
+
+    __table_args__ = (
+        CheckConstraint('level >= 1 AND level <= 20', name='check_character_level_range'),
+    )
+
+    def __repr__(self):
+        return f"Character(id={self.id} " \
+            + f"name: {self.name} " \
+            + f"level: {self.level} "\
+            + f"user_id: {self.user_id})"
