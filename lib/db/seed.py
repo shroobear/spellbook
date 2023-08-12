@@ -1,4 +1,4 @@
-from models import Spell, User, Character
+from models import Spell, User, Character, Spellbook
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from faker import Faker
@@ -37,6 +37,7 @@ def populate_spells():
         
 
         # import ipdb; ipdb.set_trace()
+        print("Seeding Spells 🪄")
         new_spell = Spell(
             name = spell_data['name'],
             description = '/n'.join(spell_data['desc']),
@@ -50,11 +51,13 @@ def populate_spells():
             concentration = int(spell_data['concentration']),
             casting_time = spell_data['casting_time'],
             # damage_type = damage_type,
+            # damage is a stretch goal, there's a lot of nested JSON to navigate
             school = school
         )
         print(new_spell.name, new_spell.casting_level)
         session.add(new_spell)
         session.commit()
+    print(session.query(Spell)[-1], " Spells seeded successfully")
 
 
 def populate_user():
@@ -79,15 +82,32 @@ def populate_character():
         new_character = Character(
             name = names.human(),
             level = random.randint(1, 20),
-            user_id = random.randint(0, 9)
+            user_id = random.randint(1, 10)
         )
         session.add(new_character)
 
     session.commit()
 
+def assign_spells():
+    # clear_table(Spellbook)
+    spell_count = session.query(Spell).count()
+    character_count = session.query(Character).count()
+
+    for _ in range(200):
+        random_spell = random.randint(1, spell_count)
+        random_character = random.randint(1, character_count)
+
+        learned_spell = Spellbook(
+            character_id = random_character,
+            spell_id = random_spell
+        )
+        session.add(learned_spell)
+    
+    session.commit()
 
 
+import ipdb; ipdb.set_trace()
 # populate_spells()
 # populate_user()
 # populate_character()
-import ipdb; ipdb.set_trace()
+# assign_spells()

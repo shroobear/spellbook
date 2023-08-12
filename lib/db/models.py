@@ -22,6 +22,7 @@ class Spell(Base):
     casting_time = Column(String)
     damage_type = Column(String)
     school = Column(String)
+    spellbooks = relationship("Spellbook", back_populates='spell')
 
     def __repr__(self):
         return f"Spell(id={self.id} \n" \
@@ -62,6 +63,7 @@ class Character(Base):
     name = Column(String, nullable=False)
     level = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id'))
+    spells = relationship('Spellbook', back_populates="character")
 
     __table_args__ = (
         CheckConstraint('level >= 1 AND level <= 20', name='check_character_level_range'),
@@ -72,3 +74,14 @@ class Character(Base):
             + f"name: {self.name} " \
             + f"level: {self.level} "\
             + f"user_id: {self.user_id})"
+    
+class Spellbook(Base):
+    __tablename__ = 'spellbook'
+
+    id = Column(Integer, primary_key=True)
+
+    character_id = Column(Integer, ForeignKey('character.id'))
+    spell_id = Column(Integer, ForeignKey('spell.id'))
+
+    character = relationship('Character', back_populates='spells')
+    spell = relationship('Spell', back_populates = 'spellbooks')
