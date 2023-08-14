@@ -42,15 +42,16 @@ def populate_spells():
                 damage_type = "TBD"
             if 'damage_at_slot_level' in spell_data['damage']:
                 damage_at_slot_level = spell_data['damage']['damage_at_slot_level']
-                first_dice_value = list(damage_at_slot_level.values())[0]
-                damage = first_dice_value
-            else:
-                damage = None
+                spell_damage = list(damage_at_slot_level.values())[0]
+            elif 'damage_at_character_level' in spell_data['damage']:
+                damage_at_character_level = spell_data['damage']['damage_at_character_level']
+                spell_damage = list(damage_at_character_level.values())[0]
         else:
+            print(f"No damage type for {spell_data['name']}")
             damage_type = None
+            spell_damage = None
         if spell_data.get('heal_at_slot_level'):
-            heal_at_slot_level = list(spell_data['heal_at_slot_level'].values())
-            healing = heal_at_slot_level[0]
+            healing = list(spell_data['heal_at_slot_level'].values())[0]
         else:
             healing = None
         
@@ -73,12 +74,12 @@ def populate_spells():
             casting_time = spell_data['casting_time'],
             school = school,
             damage_type = damage_type,
-            damage = damage,
+            damage = spell_damage,
             healing = healing,
             classes = class_list
         )
         session.add(new_spell)
-        session.commit()
+    session.commit()
     print(session.query(Spell).count(), " Spells seeded successfully 🌱")
 
 
@@ -144,8 +145,8 @@ def assign_spells():
     session.commit()
     print("Spellbooks seeded successfully 🌱")
 
-# clear_all()
-# populate_spells()
-# populate_user()
+clear_all()
+populate_spells()
+populate_user()
 populate_character()
 assign_spells()
