@@ -10,6 +10,9 @@ alembic = "*"
 faker = "*"
 fantasynames = "*"
 click = "*"
+colour = "*"
+keyboard = "*"
+simple-term-menu = "*"
 
 [dev-packages]
 
