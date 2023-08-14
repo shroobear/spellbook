@@ -12,7 +12,6 @@ session = Session()
 fake = Faker()
 
 import requests
-import json
 
 response = requests.get("https://www.dnd5eapi.co/api/spells/")
 json_data = response.json()
@@ -22,8 +21,13 @@ def clear_table(table_class):
     session.query(table_class).delete()
     session.commit()
 
-def populate_spells():
+def clear_all():
+    clear_table(User)
     clear_table(Spell)
+    clear_table(Character)
+    clear_table(Spellbook)
+
+def populate_spells():
     print("Seeding Spells 🪄")
 
     for entry in spells:
@@ -73,14 +77,12 @@ def populate_spells():
             healing = healing,
             classes = class_list
         )
-        print(new_spell.classes)
         session.add(new_spell)
         session.commit()
     print(session.query(Spell).count(), " Spells seeded successfully 🌱")
 
 
 def populate_user():
-    clear_table(User)
     print("Seeding users 👥")
 
     Faker.seed(0)
