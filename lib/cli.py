@@ -25,7 +25,7 @@ class Prompt():
 
 def main():
     spellbook_banner()
-    options = ["Login", "Create New User", "Quit"]
+    options = ["Login", "Create New User", "View Spells", "Quit"]
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     selection = options[menu_entry_index]
@@ -33,6 +33,8 @@ def main():
         login()
     elif selection == "Create New User":
         new_user()
+    elif selection == "View Spells":
+        view_spells()
     elif selection == "Quit":
         quit()
 
@@ -41,7 +43,7 @@ def login():
     validation = session.query(User).filter(User.username.like(f"%{value}%")).first()
     # import ipdb; ipdb.set_trace()
     if validation == None:
-        clear_screen(40)
+        spellbook_banner()
         print(f"User '{value}' not found")
         login()
     elif validation.username == value:
@@ -88,10 +90,10 @@ def character_select():
         create_character()
     open_character(selection)
 
-def open_character(selection):
+def open_character(character):
     spellbook_banner()
     global current_character
-    current_character = session.query(Character).filter(Character.name == selection).first()
+    current_character = session.query(Character).filter(Character.name == character).first()
     clear_screen(30)
     print(f"Character Name: {current_character.name}\n"
           f"Character Level: {current_character.level}\n"
@@ -102,8 +104,16 @@ def open_character(selection):
         spell = spellbook.spell
         print(spell.name)
 
-    input("Press Enter to go back to the character selection.")
-    character_select()
+    options = ["View Master Spell List", "Return", "Quit"]
+    terminal_menu = TerminalMenu(options)
+    menu_entry_index = terminal_menu.show()
+    selection = options[menu_entry_index]
+    if selection == "View Master Spell List":
+        view_spells()
+    if selection == "Return":
+        character_select()
+    if selection == "Quit":
+        pass
 
 def create_character():
     print("New Character:")
@@ -137,6 +147,60 @@ def create_character():
     open_character(new_character.name)
     
     # import ipdb; ipdb.set_trace()
+
+def view_spells():
+    spell_list = []
+    spells = session.query(Spell).all()
+    for spell in spells:
+        spell_list.append(spell.name)
+    print('\n'.join(spell_list))
+    selected_spell = Prompt.ask("Type a spell name to view it: ")
+    validation = session.query(Spell).filter(Spell.name.like(f"%{selected_spell}%")).first()
+    if validation == None:
+        clear_screen(40)
+        print(f"'{selected_spell}' not found.")
+        time.sleep(.5)
+        view_spells()
+    elif validation.name.lower() == selected_spell.lower():
+        clear_screen(30)
+        input(f"You selected {validation.name}. Press Enter to confirm.")
+        clear_screen(30)
+        view_spell(validation.name)
+
+def view_spell(spell):
+    query = session.query(Spell).filter(Spell.name == spell).first()
+    print(query)
+    if current_character:
+        options = ["Learn Spell", "Return to Spell List", "Return to Character", "Quit"]
+    else:
+        options = ["Spell List", "Home", "Quit"]
+    terminal_menu = TerminalMenu(options)
+    menu_entry_index = terminal_menu.show()
+    selection = options[menu_entry_index]
+    if selection == "Learn Spell":
+            # import ipdb; ipdb.set_trace()
+        learned_spell = Spellbook(
+            spell_id = query.id,
+            character_id = current_character.id,
+        )
+        session.add(learned_spell)
+        session.commit()
+        print("Spell Learned successfully 🧙‍♂️")
+        open_character(current_character.name)
+    elif selection == "Return to Spell List":
+        view_spells()
+    elif selection == "Return to Character":
+        open_character(current_character.name)
+    elif selection == "Quit":
+        pass
+    elif selection == "Spell List":
+        view_spells()
+    elif selection == "Home":
+        main()
+    elif selection == "Quit":
+        pass
+
+
 
 
 def quit():
