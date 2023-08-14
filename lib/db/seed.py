@@ -98,15 +98,28 @@ def populate_user():
     print("Users seeded successfully 🌱")
 
 def populate_character():
-    clear_table(Character)
     print("Seeding characters 🧌")
+    classes = ["Barbarian",
+        "Bard", 
+        "Cleric", 
+        "Druid", 
+        "Fighter", 
+        "Monk", 
+        "Paladin",
+        "Ranger",
+        "Rogue",
+        "Sorcerer", 
+        "Warlock", 
+        "Wizard"
+    ]
 
     Faker.seed(0)
     for _ in range(25):
         new_character = Character(
             name = names.human(),
             level = random.randint(1, 20),
-            user_id = random.randint(1, 10)
+            user_id = random.randint(1, 10),
+            character_class = random.choice(classes)
         )
         session.add(new_character)
 
@@ -114,7 +127,6 @@ def populate_character():
     print("Characters seeded successfully 🌱")
 
 def assign_spells():
-    clear_table(Spellbook)
     print("Learning Spells 📖")
     spell_count = session.query(Spell).count()
     character_count = session.query(Character).count()
@@ -132,7 +144,8 @@ def assign_spells():
     session.commit()
     print("Spellbooks seeded successfully 🌱")
 
-populate_spells()
-populate_user()
+# clear_all()
+# populate_spells()
+# populate_user()
 populate_character()
 assign_spells()

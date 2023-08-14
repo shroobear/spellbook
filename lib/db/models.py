@@ -70,6 +70,7 @@ class Character(Base):
     name = Column(String, nullable=False)
     level = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id'))
+    character_class = Column(String)
     spells = relationship('Spellbook', back_populates="character")
 
     __table_args__ = (
@@ -80,7 +81,8 @@ class Character(Base):
         return f"Character(id={self.id} " \
             + f"name: {self.name} " \
             + f"level: {self.level} "\
-            + f"user_id: {self.user_id})"
+            + f"user_id: {self.user_id}"\
+            + f"class: {self.character_class})"
     
 class Spellbook(Base):
     __tablename__ = 'spellbook'
