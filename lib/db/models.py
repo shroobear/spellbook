@@ -59,7 +59,8 @@ class User(Base):
 
     def __repr__(self):
         return f"User(id={self.id} " \
-            + f"Name: {self.first_name} {self.last_name})"
+            + f"Name: {self.first_name} {self.last_name} " \
+            + f"Username: {self.username})"
 
 class Character(Base):
     __tablename__ = 'character'
