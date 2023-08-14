@@ -41,8 +41,11 @@ def login():
     validation = session.query(User).filter(User.username.like(f"%{value}%")).first()
     # import ipdb; ipdb.set_trace()
     if validation == None:
-        print(f"User '{value}' not found")
-        login()
+        val = input(f"User '{value}' not found. Would you like to create a new user?")
+        if val in ["Y", "y", "yes", "Yes"]:
+            new_user()
+        else:
+            main()
     elif validation.username == value:
         print(f"Welcome back, {validation.first_name}!")
         global current_user
