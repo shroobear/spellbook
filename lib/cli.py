@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
 import time
+from prompt import Prompt
 from helpers import *
 from banners import *
 from db.models import Spell, User, Character, Spellbook
@@ -15,14 +16,11 @@ session = Session()
 current_user = None
 current_character = None
 
+# Notes: Break into appropriate classes
+# Separate session into its own file
+# Terminal menu in prompt class
 
-class Prompt:
-    def ask(question):
-        value = input(question)
-        return value
 
-    def yes_or_no(question):
-        value = input(question + " y/n: ")
 
 
 def main():
