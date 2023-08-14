@@ -5,7 +5,7 @@ from helpers import *
 from banners import *
 from db.models import Spell, User, Character, Spellbook
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 from simple_term_menu import TerminalMenu
 
 engine = create_engine("sqlite:///db/spell.db")
@@ -21,7 +21,7 @@ class Prompt():
         return value
     
     def yes_or_no(question):
-        value = input(question + " y/n")
+        value = input(question + " y/n: ")
 
 def main():
     spellbook_banner()
@@ -90,10 +90,10 @@ def character_select():
         create_character()
     open_character(selection)
 
-def open_character(character):
+def open_character(character_name):
     spellbook_banner()
     global current_character
-    current_character = session.query(Character).filter(Character.name == character).first()
+    current_character = session.query(Character).filter(Character.name == character_name).first()
     clear_screen(30)
     print(f"Character Name: {current_character.name}\n"
           f"Character Level: {current_character.level}\n"
@@ -104,15 +104,17 @@ def open_character(character):
         spell = spellbook.spell
         print(spell.name)
 
-    options = ["View Master Spell List", "Return", "Quit"]
+    options = ["Edit Spells", "View Master Spell List", "Return", "Quit"]
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
     selection = options[menu_entry_index]
-    if selection == "View Master Spell List":
+    if selection == "Edit Spells":
+        edit_spells()
+    elif selection == "View Master Spell List":
         view_spells()
-    if selection == "Return":
+    elif selection == "Return":
         character_select()
-    if selection == "Quit":
+    elif selection == "Quit":
         pass
 
 def create_character():
@@ -186,6 +188,7 @@ def view_spell(spell):
         session.add(learned_spell)
         session.commit()
         print("Spell Learned successfully 🧙‍♂️")
+        time.sleep(1)
         open_character(current_character.name)
     elif selection == "Return to Spell List":
         view_spells()
@@ -200,7 +203,41 @@ def view_spell(spell):
     elif selection == "Quit":
         pass
 
+def edit_spells():
+    print("Select a spell to remove: \n")
+    options = []
+    for spellbook in current_character.spells:
+        options.append(spellbook.spell.name)
+    options.append("Return")
+    terminal_menu = TerminalMenu(options)
+    menu_entry_index = terminal_menu.show()
+    spell_selection = options[menu_entry_index]
+    if spell_selection == "Return":
+        open_character(current_character.name)
+    else:
+        value = str(input(f"You've selected {spell_selection}. Are you sure you'd like to remove this spell? y/n: "))
+        if value == 'y' or value == 'Y':
+            spell_id = session.query(Spell).filter(Spell.name == spell_selection).first().id
+            char_id = current_character.id
+            spellbook_object = session.query(Spellbook).filter(
+                Spellbook.spell_id == spell_id,
+                Spellbook.character_id == char_id
+            ).first()
+            import ipdb; ipdb.set_trace()
+            session.delete(spellbook_object)
+            session.commit()
 
+            print(f"{spell_selection} unlearned 🤯")
+            time.sleep(1)
+            open_character(current_character.name)
+        elif value == 'n' or value == 'N':
+            edit_spells()
+
+
+    
+
+def delete_character():
+    pass
 
 
 def quit():
