@@ -1,8 +1,13 @@
 from models import Spell, User, Character, Spellbook
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 from faker import Faker
 import fantasynames as names
 import random
-import session
+
+engine = create_engine("sqlite:///spell.db")
+Session = sessionmaker(bind=engine)
+session = Session()
 
 fake = Faker()
 

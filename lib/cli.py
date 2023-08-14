@@ -5,8 +5,12 @@ from prompt import Prompt
 from helpers import *
 from banners import *
 from db.models import Spell, User, Character, Spellbook
-import session
-from simple_term_menu import TerminalMenu
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, delete
+
+engine = create_engine("sqlite:///db/spell.db")
+Session = sessionmaker(bind=engine)
+session = Session()
 
 current_user = None
 current_character = None
@@ -21,9 +25,7 @@ current_character = None
 def main():
     spellbook_banner()
     options = ["Login", "Create New User", "View Spells", "Quit"]
-    terminal_menu = TerminalMenu(options)
-    menu_entry_index = terminal_menu.show()
-    selection = options[menu_entry_index]
+    selection = Prompt.menu(options)
     if selection == "Login":
         login()
     elif selection == "Create New User":
@@ -39,7 +41,6 @@ def login():
     validation = session.query(User).filter(User.username.like(f"%{value}%")).first()
     # import ipdb; ipdb.set_trace()
     if validation == None:
-        spellbook_banner()
         print(f"User '{value}' not found")
         login()
     elif validation.username == value:
@@ -75,17 +76,15 @@ def new_user():
 def character_select():
     spellbook_banner()
     print("Characters:\n")
-    options = []
+    characters = []
     char_id = 1
     for character in current_user.characters:
-        options.append(f"{character.name}")
+        characters.append(f"{character.name}")
         char_id += 1
-    options.append("")
-    options.append("Logout")
-    options.append("Create New Character")
-    terminal_menu = TerminalMenu(options, skip_empty_entries=True)
-    menu_entry_index = terminal_menu.show()
-    selection = options[menu_entry_index]
+    characters.append("")
+    characters.append("Logout")
+    characters.append("Create New Character")
+    selection = Prompt.menu(characters)
     if selection == "Logout":
         main()
     elif selection == "Create New Character":
@@ -112,9 +111,7 @@ def open_character(character_name):
         print(spell.name)
 
     options = ["Remove Spells", "View Master Spell List", "Return", "Quit"]
-    terminal_menu = TerminalMenu(options)
-    menu_entry_index = terminal_menu.show()
-    selection = options[menu_entry_index]
+    selection = Prompt.menu(options)
     if selection == "Remove Spells":
         remove_spells()
     elif selection == "View Master Spell List":
@@ -143,9 +140,7 @@ def create_character():
         "Warlock",
         "Wizard",
     ]
-    terminal_menu = TerminalMenu(classes)
-    menu_entry_index = terminal_menu.show()
-    selection = classes[menu_entry_index]
+    selection = Prompt.menu(classes)
 
     new_character = Character(
         name=name, level=level, character_class=selection, user_id=current_user.id
@@ -200,9 +195,7 @@ def view_spell(spell):
 
     else:
         options = ["Spell List", "Home", "Quit"]
-    terminal_menu = TerminalMenu(options)
-    menu_entry_index = terminal_menu.show()
-    selection = options[menu_entry_index]
+    selection = Prompt.menu(options)
     if selection == "Learn Spell":
         # import ipdb; ipdb.set_trace()
         learned_spell = Spellbook(
@@ -236,13 +229,11 @@ def remove_spells():
     for spellbook in current_character.spells:
         options.append(spellbook.spell.name)
     options.append("Return")
-    terminal_menu = TerminalMenu(options)
-    menu_entry_index = terminal_menu.show()
-    spell_selection = options[menu_entry_index]
-    if spell_selection == "Return":
+    selection = Prompt.menu(options)
+    if selection == "Return":
         open_character(current_character.name)
     else:
-        remove_spell(spell_selection)
+        remove_spell(selection)
 
 
 def get_character_spells():
