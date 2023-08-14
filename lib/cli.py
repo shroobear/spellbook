@@ -5,13 +5,8 @@ from prompt import Prompt
 from helpers import *
 from banners import *
 from db.models import Spell, User, Character, Spellbook
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, delete
+import session
 from simple_term_menu import TerminalMenu
-
-engine = create_engine("sqlite:///db/spell.db")
-Session = sessionmaker(bind=engine)
-session = Session()
 
 current_user = None
 current_character = None
