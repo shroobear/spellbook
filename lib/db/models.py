@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
 Base = declarative_base()
 
 class Spell(Base):
@@ -29,8 +28,7 @@ class Spell(Base):
     
 
     def __repr__(self):
-        return f"Spell id: {self.id} \n" \
-            + f"Name: {self.name}\n" \
+        return f"Name: {self.name}\n" \
             + f"Description: \n{self.description}\n" \
             + f"Casting Level: {self.casting_level}\n" \
             + f"Higher Level: {self.higher_level}\n" \
