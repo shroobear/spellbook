@@ -123,6 +123,7 @@ def open_character(character_name):
 
     options = {
         "Edit Spells": edit_spells,
+        "View a Learned Spell": character_spells_prompt,
         "View Master Spell List": view_all_spells,
         "Filter Spells": filter_spells,
         "Return to Character Select": character_select,
@@ -130,6 +131,13 @@ def open_character(character_name):
         "Quit": quit,
         }
     Prompt.dict_menu(options)
+
+def character_spells_prompt():
+    spells = get_character_spells()
+    print("Please select a spell:")
+    selection = Prompt.menu(spells)
+    view_spell(selection)
+
 
 def delete_character():
     confirmation = input(f"Are you sure you'd like to delete {current_character.name} and all their data? y/n: ")
@@ -191,47 +199,31 @@ def view_spell(spell):
     print(query)
     if current_character:
         if spell in get_character_spells():
-            options = [
-                "Forget Spell",
-                "Return to Spell List",
-                "Return to Character",
-                "Quit",
-            ]
+            options= {
+                "Forget Spell": lambda: remove_spell(spell),
+                "Return to Spell List": view_all_spells,
+                "Return to Character": lambda: open_character(current_character.name),
+                "Quit": quit
+            }
         else:
-            options = [
-                "Learn Spell",
-                "Return to Spell List",
-                "Return to Character",
-                "Quit",
-            ]
-
-    else:
-        options = ["Spell List", "Home", "Quit"]
-    selection = Prompt.menu(options)
-    if selection == "Learn Spell":
-        learn_spell(query)
-    elif selection == "Forget Spell":
-        remove_spell(spell)
-    elif selection == "Return to Spell List":
-        view_all_spells()
-    elif selection == "Return to Character":
-        open_character(current_character.name)
-    elif selection == "Home":
-        main()
-    elif selection == "Quit":
-        pass
-    elif selection == "Spell List":
-        view_all_spells()
-    elif selection == "Logout":
-        main()
-    elif selection == "Quit":
-        pass
+            options = {
+                "Learn Spell": lambda: learn_spell(query),
+                "Return to Spell List": view_all_spells,
+                "Return to Character": lambda: open_character(current_character.name),
+                "Quit": quit
+            }
+    else: options = {
+        "Return to Spell List": view_all_spells,
+        "Home": main,
+        "Quit": quit
+    }
+    Prompt.dict_menu(options)
 
 
 def learn_spell(spell):
     learned_spell = Spellbook(
-    spell_id=spell.id,
-    character_id=current_character.id,
+        spell_id=spell.id,
+        character_id=current_character.id,
     )
     session.add(learned_spell)
     session.commit()
