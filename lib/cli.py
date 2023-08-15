@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
 import time
+# from filter import Filter
 from prompt import Prompt
 from helpers import *
 from banners import *
@@ -12,8 +13,23 @@ engine = create_engine("sqlite:///db/spell.db")
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# Global
 current_user = None
 current_character = None
+character_classes = [
+    "Barbarian",
+    "Bard",
+    "Cleric",
+    "Druid",
+    "Fighter",
+    "Monk",
+    "Paladin",
+    "Ranger",
+    "Rogue",
+    "Sorcerer",
+    "Warlock",
+    "Wizard",
+]
 
 # Notes: Break into appropriate classes
 # Separate session into its own file
@@ -24,14 +40,16 @@ current_character = None
 
 def main():
     spellbook_banner()
-    options = ["Login", "Create New User", "View Spells", "Quit"]
+    options = ["Login", "Create New User", "View Spells", "Filter Spells", "Quit"]
     selection = Prompt.menu(options)
     if selection == "Login":
         login()
     elif selection == "Create New User":
         new_user()
     elif selection == "View Spells":
-        view_spells()
+        view_all_spells()
+    elif selection == "Filter Spells":
+        filter_spells()
     elif selection == "Quit":
         quit()
 
@@ -39,7 +57,6 @@ def main():
 def login():
     value = input("Please enter username: ")
     validation = session.query(User).filter(User.username.like(f"%{value}%")).first()
-    # import ipdb; ipdb.set_trace()
     if validation == None:
         val = input(f"User '{value}' not found. Would you like to create a new user?")
         if val in ["Y", "y", "yes", "Yes"]:
@@ -55,7 +72,6 @@ def login():
         time.sleep(1)
         character_select()
 
-    # import ipdb; ipdb.set_trace()
 
 
 def new_user():
@@ -113,14 +129,16 @@ def open_character(character_name):
         spell = spellbook.spell
         print(spell.name)
 
-    options = ["Remove Spells", "View Master Spell List", "Return", "Quit"]
+    options = ["Remove Spells", "View Master Spell List", "Filter Spells", "Return", "Quit"]
     selection = Prompt.menu(options)
     if selection == "Remove Spells":
-        remove_spells()
+        edit_spells()
     elif selection == "View Master Spell List":
-        view_spells()
+        view_all_spells()
     elif selection == "Return":
         character_select()
+    elif selection == "Filter Spells":
+        filter_spells()
     elif selection == "Quit":
         pass
 
@@ -129,21 +147,7 @@ def create_character():
     print("New Character:")
     name = Prompt.ask("Character Name: ")
     level = Prompt.ask("Character Level: ")
-    classes = [
-        "Barbarian",
-        "Bard",
-        "Cleric",
-        "Druid",
-        "Fighter",
-        "Monk",
-        "Paladin",
-        "Ranger",
-        "Rogue",
-        "Sorcerer",
-        "Warlock",
-        "Wizard",
-    ]
-    selection = Prompt.menu(classes)
+    selection = Prompt.menu(character_classes)
 
     new_character = Character(
         name=name, level=level, character_class=selection, user_id=current_user.id
@@ -152,16 +156,14 @@ def create_character():
     session.commit()
     open_character(new_character.name)
 
-    # import ipdb; ipdb.set_trace()
 
 
-def view_spells():
-    spell_list = []
+def view_all_spells():
     spells = session.query(Spell).all()
-    for spell in spells:
-        spell_list.append(spell.name)
-    print("\n".join(spell_list))
-    selected_spell = Prompt.ask("Type a spell name to view it: ")
+    selected_spell = display_spells(spells)
+    validate_spell_selection(selected_spell, view_all_spells)
+    
+def validate_spell_selection(selected_spell, return_func):    
     validation = (
         session.query(Spell).filter(Spell.name.like(f"%{selected_spell}%")).first()
     )
@@ -169,13 +171,18 @@ def view_spells():
         clear_screen(40)
         print(f"'{selected_spell}' not found.")
         time.sleep(0.5)
-        view_spells()
+        return_func()
     elif validation.name.lower() == selected_spell.lower():
         clear_screen(30)
         input(f"You selected {validation.name}. Press Enter to confirm.")
         clear_screen(30)
         view_spell(validation.name)
 
+def display_spells(spells):
+    for spell in spells:
+        print(spell.name)
+    spell_selection = Prompt.ask("Please enter a spell name to view it:")
+    return spell_selection
 
 def view_spell(spell):
     query = session.query(Spell).filter(Spell.name == spell).first()
@@ -200,7 +207,6 @@ def view_spell(spell):
         options = ["Spell List", "Home", "Quit"]
     selection = Prompt.menu(options)
     if selection == "Learn Spell":
-        # import ipdb; ipdb.set_trace()
         learned_spell = Spellbook(
             spell_id=query.id,
             character_id=current_character.id,
@@ -213,20 +219,22 @@ def view_spell(spell):
     elif selection == "Forget Spell":
         remove_spell(spell)
     elif selection == "Return to Spell List":
-        view_spells()
+        view_all_spells()
     elif selection == "Return to Character":
         open_character(current_character.name)
+    elif selection == "Home":
+        main()
     elif selection == "Quit":
         pass
     elif selection == "Spell List":
-        view_spells()
+        view_all_spells()
     elif selection == "Logout":
         main()
     elif selection == "Quit":
         pass
 
 
-def remove_spells():
+def edit_spells():
     print("Select a spell to remove: \n")
     options = []
     for spellbook in current_character.spells:
@@ -260,7 +268,6 @@ def remove_spell(spell_selection):
             .filter(Spellbook.spell_id == spell_id, Spellbook.character_id == char_id)
             .first()
         )
-        # import ipdb; ipdb.set_trace()
         session.delete(spellbook_object)
         session.commit()
 
@@ -268,12 +275,61 @@ def remove_spell(spell_selection):
         time.sleep(1)
         open_character(current_character.name)
     elif value == "n" or value == "N":
-        remove_spells()
+        edit_spells()
     else:
         print("Command not recognized")
         time.sleep(1)
         open_character(current_character.name)
 
+def filter_spells():
+    options = ["Sort Spells by Level", "Attack Spells", "Healing Spells", "Sort Spells by School", "Sort Spells by Class"]
+    selection = Prompt.menu(options)
+    if selection == "Sort Spells by Level":
+        filter_spells_by_level()
+    if selection == "Attack Spells":
+        filter_attack_spells()
+    if selection == "Healing Spells":
+        filter_healing_spells()
+    if selection == "Sort Spells by School":
+        filter_spells_by_school()
+    if selection == "Sort Spells by Class":
+        filter_spells_by_class()
+
+def filter_spells_by_level():
+    # debug()
+    print("Please select a casting level:")
+    levels = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    selection = Prompt.menu(levels)
+    spell_list = session.query(Spell).filter(Spell.casting_level == selection)
+    spell_selection = display_spells(spell_list)
+    validate_spell_selection(spell_selection, sort_spells_by_level)
+
+
+def filter_attack_spells():
+    attack_spells = session.query(Spell).filter(Spell.damage != None)
+    print("Attack Spells:")
+    spell_selection = display_spells(attack_spells)
+    validate_spell_selection(spell_selection, filter_attack_spells)
+
+def filter_healing_spells():
+    healing_spells = session.query(Spell).filter(Spell.healing != None)
+    spell_selection = display_spells(healing_spells)
+    validate_spell_selection(spell_selection, filter_healing_spells)
+
+def filter_spells_by_school():
+    print("Please select a school:")
+    schools = ["Conjuration", "Evocation", "Illusion", "Necromancy", "Enchantment", "Transmutation", "Abjuration", "Divination"]
+    selection = Prompt.menu(schools)
+    school_spells = session.query(Spell).filter(Spell.school == selection)
+    spell_selection = display_spells(school_spells)
+    validate_spell_selection(spell_selection, filter_spells_by_school)
+
+def filter_spells_by_class():
+    print("Please select a class:")
+    class_selection = Prompt.menu(character_classes)
+    class_spells = session.query(Spell).filter(Spell.classes.like(f"%{class_selection}%"))
+    spell_selection = display_spells(class_spells)
+    validate_spell_selection(spell_selection, filter_spells_by_class)
 
 def delete_character():
     pass
@@ -283,6 +339,8 @@ def quit():
     print("Goodbye!")
     exit()
 
+def debug():
+    import ipdb; ipdb.set_trace()
 
 if __name__ == "__main__":
     main()
