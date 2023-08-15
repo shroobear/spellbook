@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import click
 import time
-
+from art import *
 # from filter import Filter
 from prompt import Prompt
 from helpers import *
-from banners import *
+from banners import Banner
 from db.models import Spell, User, Character, Spellbook
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, delete
@@ -38,7 +38,7 @@ character_classes = [
 
 
 def main():
-    spellbook_banner()
+    Banner.spellbook()
     options = {
         "Login": login,
         "Create New User": new_user,
@@ -89,18 +89,15 @@ def new_user():
 
 
 def character_select():
-    spellbook_banner()
+    Banner.spellbook()
     print("Characters:\n")
-    characters = []
+    character_dict= {}
     for character in current_user.characters:
-        characters.append(f"{character.name}")
-    choices = characters + ["", "Logout", "Create New Character"]
-    selection = Prompt.menu(choices)
-    if selection == "Logout":
-        main()
-    elif selection == "Create New Character":
-        create_character()
-    open_character(selection)
+        character_dict[f'{character.name}']=character.name
+    character_dict[""]=""
+    character_dict['Logout']=main
+    character_dict["Create New Character"]=create_character
+    Prompt.dict_menu(character_dict)
 
 
 def open_character(character_name):
@@ -108,10 +105,8 @@ def open_character(character_name):
     current_character = (
         session.query(Character).filter(Character.name == character_name).first()
     )
-    clear_screen(30)
-    spellbook_banner()
+    Banner.generator(character_name, 255, 105, 180)
     print(
-        f"Character Name: {current_character.name}\n"
         f"Character Level: {current_character.level}\n"
         f"Character Class: {current_character.character_class}\n"
         "Spells:"
@@ -134,7 +129,7 @@ def open_character(character_name):
 
 def character_spells_prompt():
     spells = get_character_spells()
-    print("Please select a spell:")
+    print("\nPlease select a spell: \n")
     selection = Prompt.menu(spells)
     view_spell(selection)
 
@@ -174,10 +169,29 @@ def view_all_spells():
     validate_spell_selection(selected_spell, view_all_spells)
 
 def spell_index(spells):
+    # debug()
     for spell in spells:
-        print(spell.name)
-    spell_selection = Prompt.ask("Please enter a spell name to view it:")
+        if current_character:
+            if spell.name in get_character_spells():
+                print(color(spell.name).rgb_fg(0, 255, 255))
+            if spell.damage:
+                print(color(spell.name).rgb_fg(210, 4, 45))
+            elif spell.healing:
+                print(color(spell.name).rgb_fg(80, 200, 120))
+            else:
+                print(spell.name)
+        elif current_character == None:
+            if spell.damage:
+                print(color(spell.name).rgb_fg(210, 4, 45))
+            elif spell.healing:
+                print(color(spell.name).rgb_fg(80, 200, 120))
+            else:
+                print(spell.name)
+    print("Color Key:", color("[Attack Spells]").rgb_fg(210, 4, 45), color("[Healing Spells]").rgb_fg(80, 200, 120), color("[Learned Spells]").rgb_fg(0, 255, 255))
+    spell_selection = Prompt.ask("\nPlease enter a spell name to view it:\n")
     return spell_selection
+
+
 
 def validate_spell_selection(selected_spell, return_func):
     validation = (
@@ -196,7 +210,9 @@ def validate_spell_selection(selected_spell, return_func):
 
 def view_spell(spell):
     query = session.query(Spell).filter(Spell.name == spell).first()
+    Banner.generator(query.name)
     print(query)
+    clear_screen(2)
     if current_character:
         if spell in get_character_spells():
             options= {
