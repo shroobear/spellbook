@@ -40,18 +40,16 @@ character_classes = [
 
 def main():
     spellbook_banner()
-    options = ["Login", "Create New User", "View Spells", "Filter Spells", "Quit"]
-    selection = Prompt.menu(options)
-    if selection == "Login":
-        login()
-    elif selection == "Create New User":
-        new_user()
-    elif selection == "View Spells":
-        view_all_spells()
-    elif selection == "Filter Spells":
-        filter_spells()
-    elif selection == "Quit":
-        quit()
+    options = {
+        "Login": login,
+        "Create New User": new_user,
+        "View Spells": view_all_spells,
+        "Filter Spells": filter_spells,
+        "Quit": quit
+    }
+    selection = Prompt.menu(list(options.keys()))
+    selected_function = options.get(selection)
+    selected_function()
 
 
 def login():
@@ -330,9 +328,6 @@ def filter_spells_by_class():
     class_spells = session.query(Spell).filter(Spell.classes.like(f"%{class_selection}%"))
     spell_selection = display_spells(class_spells)
     validate_spell_selection(spell_selection, filter_spells_by_class)
-
-def delete_character():
-    pass
 
 
 def quit():
