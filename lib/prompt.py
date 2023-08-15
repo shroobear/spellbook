@@ -20,3 +20,8 @@ class Prompt:
         menu_entry_index = terminal_menu.show()
         selection = options[menu_entry_index]
         return selection
+    
+    def dict_menu(options):
+        selection = Prompt.menu(list(options.keys()))
+        selected_function = options.get(selection)
+        selected_function()

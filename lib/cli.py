@@ -46,9 +46,7 @@ def main():
         "Filter Spells": filter_spells,
         "Quit": quit,
     }
-    selection = Prompt.menu(list(options.keys()))
-    selected_function = options.get(selection)
-    selected_function()
+    Prompt.dict_menu(options)
 
 
 def login():
@@ -94,14 +92,10 @@ def character_select():
     spellbook_banner()
     print("Characters:\n")
     characters = []
-    char_id = 1
     for character in current_user.characters:
         characters.append(f"{character.name}")
-        char_id += 1
-    characters.append("")
-    characters.append("Logout")
-    characters.append("Create New Character")
-    selection = Prompt.menu(characters)
+    choices = characters + ["", "Logout", "Create New Character"]
+    selection = Prompt.menu(choices)
     if selection == "Logout":
         main()
     elif selection == "Create New Character":
@@ -127,24 +121,14 @@ def open_character(character_name):
         spell = spellbook.spell
         print(spell.name)
 
-    options = [
-        "Remove Spells",
-        "View Master Spell List",
-        "Filter Spells",
-        "Return",
-        "Quit",
-    ]
-    selection = Prompt.menu(options)
-    if selection == "Remove Spells":
-        edit_spells()
-    elif selection == "View Master Spell List":
-        view_all_spells()
-    elif selection == "Return":
-        character_select()
-    elif selection == "Filter Spells":
-        filter_spells()
-    elif selection == "Quit":
-        pass
+    options = {
+        "Remove Spells": edit_spells,
+        "View Master Spell List": view_all_spells,
+        "Filter Spells": filter_spells,
+        "Return to Character Select": character_select,
+        "Quit": quit,
+        }
+    Prompt.dict_menu(options)
 
 
 def create_character():
@@ -215,15 +199,7 @@ def view_spell(spell):
         options = ["Spell List", "Home", "Quit"]
     selection = Prompt.menu(options)
     if selection == "Learn Spell":
-        learned_spell = Spellbook(
-            spell_id=query.id,
-            character_id=current_character.id,
-        )
-        session.add(learned_spell)
-        session.commit()
-        print("Spell Learned successfully 🧙‍♂️")
-        time.sleep(1)
-        open_character(current_character.name)
+        learn_spell(query)
     elif selection == "Forget Spell":
         remove_spell(spell)
     elif selection == "Return to Spell List":
@@ -241,6 +217,17 @@ def view_spell(spell):
     elif selection == "Quit":
         pass
 
+
+def learn_spell(spell):
+    learned_spell = Spellbook(
+    spell_id=spell.id,
+    character_id=current_character.id,
+    )
+    session.add(learned_spell)
+    session.commit()
+    print("Spell Learned successfully 🧙‍♂️")
+    time.sleep(1)
+    open_character(current_character.name)
 
 def edit_spells():
     print("Select a spell to remove: \n")
@@ -268,7 +255,7 @@ def remove_spell(spell_selection):
             f"You've selected {spell_selection}. Are you sure you'd like to remove this spell? y/n: "
         )
     )
-    if value == "y" or value == "Y":
+    if value in ["y", "Y", "Yes", "yes", "YES"]:
         spell_id = session.query(Spell).filter(Spell.name == spell_selection).first().id
         char_id = current_character.id
         spellbook_object = (
@@ -282,7 +269,7 @@ def remove_spell(spell_selection):
         print(f"{spell_selection} unlearned 🤯")
         time.sleep(1)
         open_character(current_character.name)
-    elif value == "n" or value == "N":
+    elif value in ["N", "n", "no", "No", "NO"]:
         edit_spells()
     else:
         print("Command not recognized")
@@ -291,24 +278,14 @@ def remove_spell(spell_selection):
 
 
 def filter_spells():
-    options = [
-        "Sort Spells by Level",
-        "Attack Spells",
-        "Healing Spells",
-        "Sort Spells by School",
-        "Sort Spells by Class",
-    ]
-    selection = Prompt.menu(options)
-    if selection == "Sort Spells by Level":
-        filter_spells_by_level()
-    if selection == "Attack Spells":
-        filter_attack_spells()
-    if selection == "Healing Spells":
-        filter_healing_spells()
-    if selection == "Sort Spells by School":
-        filter_spells_by_school()
-    if selection == "Sort Spells by Class":
-        filter_spells_by_class()
+    options = {
+        "Sort Spells by Level": filter_spells_by_level,
+        "Attack Spells": filter_attack_spells,
+        "Healing Spells": filter_healing_spells,
+        "Sort Spells by School": filter_spells_by_school,
+        "Sort Spells by Class": filter_spells_by_class,
+    }
+    Prompt.dict_menu(options)
 
 
 def filter_spells_by_level():
@@ -318,7 +295,7 @@ def filter_spells_by_level():
     selection = Prompt.menu(levels)
     spell_list = session.query(Spell).filter(Spell.casting_level == selection)
     spell_selection = spell_index(spell_list)
-    validate_spell_selection(spell_selection, sort_spells_by_level)
+    validate_spell_selection(spell_selection, filter_spells_by_level)
 
 
 def filter_attack_spells():
