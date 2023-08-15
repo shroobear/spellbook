@@ -122,14 +122,24 @@ def open_character(character_name):
         print(spell.name)
 
     options = {
-        "Remove Spells": edit_spells,
+        "Edit Spells": edit_spells,
         "View Master Spell List": view_all_spells,
         "Filter Spells": filter_spells,
         "Return to Character Select": character_select,
+        "Delete Character": delete_character,
         "Quit": quit,
         }
     Prompt.dict_menu(options)
 
+def delete_character():
+    confirmation = input(f"Are you sure you'd like to delete {current_character.name} and all their data? y/n: ")
+    if confirmation in ["y", "Y", "yes", "Yes", "YES"]:
+        character = session.query(Character).filter(Character.id == current_character.id).first()
+        session.delete(character)
+        session.commit()
+        character_select()
+    else:
+        open_character(current_character.name)
 
 def create_character():
     print("New Character:")
@@ -337,6 +347,8 @@ def filter_spells_by_class():
     )
     spell_selection = spell_index(class_spells)
     validate_spell_selection(spell_selection, filter_spells_by_class)
+
+
 
 
 def quit():
