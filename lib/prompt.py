@@ -7,9 +7,9 @@ class Prompt:
 
     def yes_or_no(question, on_yes, on_no):
         value = input(question + " y/n: ")
-        if value in ["y","Y","Yes"]:
+        if value in ["y","Y","Yes", "YES"]:
             on_yes()
-        elif value in ["n","N","No"]:
+        elif value in ["n","N","No", "NO"]:
             on_no()
         else:
             print("Command not recognized.")
