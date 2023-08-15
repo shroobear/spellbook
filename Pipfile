@@ -13,6 +13,8 @@ click = "*"
 colour = "*"
 keyboard = "*"
 simple-term-menu = "*"
+prettycli = "*"
+art = "==6.0"
 
 [dev-packages]
 
