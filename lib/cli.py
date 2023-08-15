@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
 import time
+
 # from filter import Filter
 from prompt import Prompt
 from helpers import *
@@ -36,8 +37,6 @@ character_classes = [
 # Terminal menu in prompt class
 
 
-
-
 def main():
     spellbook_banner()
     options = {
@@ -45,7 +44,7 @@ def main():
         "Create New User": new_user,
         "View Spells": view_all_spells,
         "Filter Spells": filter_spells,
-        "Quit": quit
+        "Quit": quit,
     }
     selection = Prompt.menu(list(options.keys()))
     selected_function = options.get(selection)
@@ -56,7 +55,9 @@ def login():
     value = input("Please enter username: ")
     validation = session.query(User).filter(User.username.like(f"%{value}%")).first()
     if validation == None:
-        val = input(f"User '{value}' not found. Would you like to create a new user?")
+        val = input(
+            f"User '{value}' not found. Would you like to create a new user? y/n: "
+        )
         if val in ["Y", "y", "yes", "Yes"]:
             new_user()
         else:
@@ -69,7 +70,6 @@ def login():
         ]
         time.sleep(1)
         character_select()
-
 
 
 def new_user():
@@ -127,7 +127,13 @@ def open_character(character_name):
         spell = spellbook.spell
         print(spell.name)
 
-    options = ["Remove Spells", "View Master Spell List", "Filter Spells", "Return", "Quit"]
+    options = [
+        "Remove Spells",
+        "View Master Spell List",
+        "Filter Spells",
+        "Return",
+        "Quit",
+    ]
     selection = Prompt.menu(options)
     if selection == "Remove Spells":
         edit_spells()
@@ -143,8 +149,13 @@ def open_character(character_name):
 
 def create_character():
     print("New Character:")
-    name = Prompt.ask("Character Name: ")
-    level = Prompt.ask("Character Level: ")
+    name = Prompt.ask("Please enter a character name: ")
+    level = Prompt.ask("Please enter a character level 1-20: ")
+    if int(level) > 20:
+        print("Please enter a valid level 1-20")
+        time.sleep(1)
+        create_character()
+
     selection = Prompt.menu(character_classes)
 
     new_character = Character(
@@ -155,13 +166,18 @@ def create_character():
     open_character(new_character.name)
 
 
-
 def view_all_spells():
     spells = session.query(Spell).all()
-    selected_spell = display_spells(spells)
+    selected_spell = spell_index(spells)
     validate_spell_selection(selected_spell, view_all_spells)
-    
-def validate_spell_selection(selected_spell, return_func):    
+
+def spell_index(spells):
+    for spell in spells:
+        print(spell.name)
+    spell_selection = Prompt.ask("Please enter a spell name to view it:")
+    return spell_selection
+
+def validate_spell_selection(selected_spell, return_func):
     validation = (
         session.query(Spell).filter(Spell.name.like(f"%{selected_spell}%")).first()
     )
@@ -175,12 +191,6 @@ def validate_spell_selection(selected_spell, return_func):
         input(f"You selected {validation.name}. Press Enter to confirm.")
         clear_screen(30)
         view_spell(validation.name)
-
-def display_spells(spells):
-    for spell in spells:
-        print(spell.name)
-    spell_selection = Prompt.ask("Please enter a spell name to view it:")
-    return spell_selection
 
 def view_spell(spell):
     query = session.query(Spell).filter(Spell.name == spell).first()
@@ -279,8 +289,15 @@ def remove_spell(spell_selection):
         time.sleep(1)
         open_character(current_character.name)
 
+
 def filter_spells():
-    options = ["Sort Spells by Level", "Attack Spells", "Healing Spells", "Sort Spells by School", "Sort Spells by Class"]
+    options = [
+        "Sort Spells by Level",
+        "Attack Spells",
+        "Healing Spells",
+        "Sort Spells by School",
+        "Sort Spells by Class",
+    ]
     selection = Prompt.menu(options)
     if selection == "Sort Spells by Level":
         filter_spells_by_level()
@@ -293,40 +310,55 @@ def filter_spells():
     if selection == "Sort Spells by Class":
         filter_spells_by_class()
 
+
 def filter_spells_by_level():
     # debug()
     print("Please select a casting level:")
     levels = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     selection = Prompt.menu(levels)
     spell_list = session.query(Spell).filter(Spell.casting_level == selection)
-    spell_selection = display_spells(spell_list)
+    spell_selection = spell_index(spell_list)
     validate_spell_selection(spell_selection, sort_spells_by_level)
 
 
 def filter_attack_spells():
     attack_spells = session.query(Spell).filter(Spell.damage != None)
     print("Attack Spells:")
-    spell_selection = display_spells(attack_spells)
+    spell_selection = spell_index(attack_spells)
     validate_spell_selection(spell_selection, filter_attack_spells)
+
 
 def filter_healing_spells():
     healing_spells = session.query(Spell).filter(Spell.healing != None)
-    spell_selection = display_spells(healing_spells)
+    spell_selection = spell_index(healing_spells)
     validate_spell_selection(spell_selection, filter_healing_spells)
+
 
 def filter_spells_by_school():
     print("Please select a school:")
-    schools = ["Conjuration", "Evocation", "Illusion", "Necromancy", "Enchantment", "Transmutation", "Abjuration", "Divination"]
+    schools = [
+        "Conjuration",
+        "Evocation",
+        "Illusion",
+        "Necromancy",
+        "Enchantment",
+        "Transmutation",
+        "Abjuration",
+        "Divination",
+    ]
     selection = Prompt.menu(schools)
     school_spells = session.query(Spell).filter(Spell.school == selection)
-    spell_selection = display_spells(school_spells)
+    spell_selection = spell_index(school_spells)
     validate_spell_selection(spell_selection, filter_spells_by_school)
+
 
 def filter_spells_by_class():
     print("Please select a class:")
     class_selection = Prompt.menu(character_classes)
-    class_spells = session.query(Spell).filter(Spell.classes.like(f"%{class_selection}%"))
-    spell_selection = display_spells(class_spells)
+    class_spells = session.query(Spell).filter(
+        Spell.classes.like(f"%{class_selection}%")
+    )
+    spell_selection = spell_index(class_spells)
     validate_spell_selection(spell_selection, filter_spells_by_class)
 
 
@@ -334,8 +366,12 @@ def quit():
     print("Goodbye!")
     exit()
 
+
 def debug():
-    import ipdb; ipdb.set_trace()
+    import ipdb
+
+    ipdb.set_trace()
+
 
 if __name__ == "__main__":
     main()
