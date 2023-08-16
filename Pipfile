@@ -15,6 +15,7 @@ keyboard = "*"
 simple-term-menu = "*"
 prettycli = "*"
 art = "==6.0"
+requests = "*"
 
 [dev-packages]
 
