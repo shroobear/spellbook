@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "920aed778ad7410ca444e82837d78cc7cd3b3f6abf065e86f7ada6273eb44830"
+            "sha256": "2eaef8f324f55bbd12ae270cada7ae6ec19e84730c58b79128d89cc3979c6f03"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "about-time": {
+            "hashes": [
+                "sha256:6a538862d33ce67d997429d14998310e1dbfda6cb7d9bbfbf799c4709847fece",
+                "sha256:8bbf4c75fe13cbd3d72f49a03b02c5c7dca32169b6d49117c257e7eb3eaee341"
+            ],
+            "markers": "python_version >= '3.7' and python_version < '4'",
+            "version": "==4.2.1"
+        },
         "alembic": {
             "hashes": [
                 "sha256:3db4ce81a9072e1b5aa44c2d202add24553182672a12daf21608d6f62a8f9cf9",
@@ -23,6 +31,14 @@
             ],
             "index": "pypi",
             "version": "==1.11.3"
+        },
+        "alive-progress": {
+            "hashes": [
+                "sha256:74a95d8d0d42bc99d3a3725dbd06ebb852245f1b64e301a7c375b92b22663f7b",
+                "sha256:c80ad87ce9c1054b01135a87fae69ecebbfc2107497ae87cbe6aec7e534903db"
+            ],
+            "index": "pypi",
+            "version": "==3.1.4"
         },
         "appdirs": {
             "hashes": [
@@ -211,6 +227,12 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==3.9.2"
+        },
+        "grapheme": {
+            "hashes": [
+                "sha256:44c2b9f21bbe77cfb05835fec230bd435954275267fea1858013b102f8603cca"
+            ],
+            "version": "==0.6.0"
         },
         "greenlet": {
             "hashes": [
