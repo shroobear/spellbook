@@ -1,2 +1,2 @@
 # Ignore database files
-db/spell.db
+lib/db/spell.db
