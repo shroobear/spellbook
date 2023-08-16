@@ -47,7 +47,6 @@ def populate_spells():
                 damage_at_character_level = spell_data['damage']['damage_at_character_level']
                 spell_damage = list(damage_at_character_level.values())[0]
         else:
-            print(f"No damage type for {spell_data['name']}")
             damage_type = None
             spell_damage = None
         if spell_data.get('heal_at_slot_level'):
