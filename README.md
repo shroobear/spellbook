@@ -2,20 +2,17 @@
 
 ## Description
 
-Spellbook is a vital resource for all spellcasters in Dungeons and Dragons
-fifth edition. Just as its name suggests, Spellbook utilizes a series of
-databases to store a user's characters, and further, it keeps track of all
-spells that character has learned throughout their campaign. The application
-also allows the user to filter spells by class, casting level, school, and even
-attack and healing spells. Pulling spells from the [D&D 5e API](https://www.dnd5eapi.co/), 
-you can always be sure that the spell database is going to be filled with the
-most up-to-date and accurate information.
+Spellbook is a vital resource for all spellcasters in Dungeons and Dragons fifth edition. Just as its name suggests, Spellbook utilizes a series of databases to store a user's characters, and further, it keeps track of all
+spells that character has learned throughout their campaign. The application also allows the user to filter spells by class, casting level, school, and even attack and healing spells. Pulling spells from the [D&D 5e API](https://www.dnd5eapi.co/), you can always be sure that the spell database is going to be filled with the most up-to-date and accurate information.
 
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#Uuage)
     - [Creating an Account](#creating-an-account)
     - [Creating a Character](#creating-a-character)
+    - [Viewing Spells](#viewing-spells)
+    - [Filtering Spells](#filtering-spells)
+    - [Editing Spells](#editing-spells)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Credits](#credits)
@@ -30,11 +27,11 @@ most up-to-date and accurate information.
 - Once dependencies are installed, run `pipenv shell` to open your virtual environment.
 - Seeding databases
     - Run the following commands:
-    ```
-    alembic upgrade head    # Instantiates databases
-    cd lib/db
-    python3 seed.py    # Populates databases
-    ```
+        ```
+        alembic upgrade head    # Instantiates databases
+        cd lib/db
+        python3 seed.py         # Populates databases
+        ```
 - cd out of the db directory back into the lib folder
 - Run `./cli.py` to open application
 
@@ -57,6 +54,34 @@ Creating a character is a similar process to creating an account. Select "Create
 ![Johnny Appleseed Page](./screenshots/character-page.png)
 
 From here you have a variety of options from which to choose. Now that we're logged in as Johnny Appleseed, we can go to any of the spell lists, filtered or otherwise, and easily add and remove spells to and from Johnny's spellbook.
+
+### Viewing Spells
+Spells can be viewed a number of different ways, and they are color-coded accordingly:
+| Color | Description |
+| :---: | :---: |
+| Red | Attack Spells |
+| Green | Healing Spells |
+| Cyan | Spells Learned by the current Character |
+
+![Spell List](./screenshots/master-spell-list.png)
+
+This can be useful when browsing the list and looking for a new spell to learn, but the Master List can be pretty overwhelming. This is where the Filter Spells menu comes in handy!
+
+### Filtering Spells
+
+You can access the Spell Filters just as easily as the master spell list. When you select the "Filter Spells" menu option, you'll be provided with the following filters:
+
+![Spell Filters](./screenshots/Spell%20Filters.png)
+
+Selecting any of these will help narrow down your search a little bit. 
+
+### Editing Spells
+
+Perhaps you accidentally added a spell you didn't want to, or your learned spells have changed upon leveling up. No worries, there is a way to reflect these changes! Within any character's page is an option to "Edit Spells", which will open a prompt for you to easily select which spell to unlearn.
+
+![Edit Spells](./screenshots/edit-spells.png)
+
+
 
 ---
 
