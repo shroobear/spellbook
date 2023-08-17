@@ -20,7 +20,8 @@ most up-to-date and accurate information.
 - [Screenshots](#screenshots)
 - [Credits](#credits)
 - [Contact](#contact)
-- [Acknowledgements](#acknowledgements)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -28,18 +29,16 @@ most up-to-date and accurate information.
 - Open the cloned directory and run `pipenv install` to install dependencies.
 - Once dependencies are installed, run `pipenv shell` to open your virtual environment.
 - Seeding databases
-    - Run `alembic upgrade head` to instantiate your databases
-    - cd into the db folder: `cd lib/db`
-    - Run `python3 seed.py` to execute seed file and populate databases
+    - Run the following commands:
+    ```
+    alembic upgrade head    # Instantiates databases
+    cd lib/db
+    python3 seed.py    # Populates databases
+    ```
 - cd out of the db directory back into the lib folder
 - Run `./cli.py` to open application
 
 ## Usage
-
-<!-- Explain how to use the Spellbook App once it's installed.
-Provide examples of common use cases.
-Include command line instructions or screenshots if 
-applicable.-->
 
 On launch, you'll be presented with the Login screen for the app.
 
