@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2eaef8f324f55bbd12ae270cada7ae6ec19e84730c58b79128d89cc3979c6f03"
+            "sha256": "82f49644c3ce603de43664f72e4787a62fc34f15f378130d1cafcb75a9e660bf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -181,14 +181,6 @@
             "index": "pypi",
             "version": "==8.1.7"
         },
-        "colour": {
-            "hashes": [
-                "sha256:33f6db9d564fadc16e59921a56999b79571160ce09916303d35346dddc17978c",
-                "sha256:af20120fefd2afede8b001fbef2ea9da70ad7d49fafdb6489025dae8745c3aee"
-            ],
-            "index": "pypi",
-            "version": "==0.1.5"
-        },
         "decorator": {
             "hashes": [
                 "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330",
@@ -355,14 +347,6 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==0.19.0"
-        },
-        "keyboard": {
-            "hashes": [
-                "sha256:63ed83305955939ca5c9a73755e5cc43e8242263f5ad5fd3bb7e0b032f3d308b",
-                "sha256:8e9c2422f1217e0bd84489b9ecd361027cc78415828f4fe4f88dd4acd587947b"
-            ],
-            "index": "pypi",
-            "version": "==0.13.5"
         },
         "mako": {
             "hashes": [
