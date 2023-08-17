@@ -96,6 +96,8 @@ Perhaps you accidentally added a spell you didn't want to, or your learned spell
 ![Title Screen](./screenshots/Title-screen.png)
 ![Character Page](./screenshots/character-page.png)
 ![Master Spell List](./screenshots/master-spell-list.png)
+![Edit Spells](./screenshots/edit-spells.png)
+![Spell Filters](./screenshots/Spell%20Filters.png)
 ![Adding/Removing Spells](./screenshots/Add-remove-spells.gif)
 
 ## Credits
