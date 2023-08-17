@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from faker import Faker
 import fantasynames as names
 import random
-from alive_progress import alive_bar
+from alive_progress import alive_bar, alive_it
 
 engine = create_engine("sqlite:///spell.db")
 Session = sessionmaker(bind=engine)
@@ -30,57 +30,55 @@ def clear_all():
 
 def populate_spells():
     print("Seeding Spells 🪄\n")
-    with alive_bar(319, bar="filling", spinner="dots_waves2", spinner_length=20) as bar:
-        for entry in spells:
-            r = requests.get(f"http://www.dnd5eapi.co{entry['url']}")
-            spell_data = r.json()
+    for entry in alive_it(spells):
+        r = requests.get(f"http://www.dnd5eapi.co{entry['url']}")
+        spell_data = r.json()
 
-            material = spell_data.get('material', None)
-            if spell_data.get('damage'):
-                if 'damage_type' in spell_data['damage']:
-                    damage_type = spell_data['damage']['damage_type']['name']
-                else:
-                    damage_type = "TBD"
-                if 'damage_at_slot_level' in spell_data['damage']:
-                    damage_at_slot_level = spell_data['damage']['damage_at_slot_level']
-                    spell_damage = list(damage_at_slot_level.values())[0]
-                elif 'damage_at_character_level' in spell_data['damage']:
-                    damage_at_character_level = spell_data['damage']['damage_at_character_level']
-                    spell_damage = list(damage_at_character_level.values())[0]
+        material = spell_data.get('material', None)
+        if spell_data.get('damage'):
+            if 'damage_type' in spell_data['damage']:
+                damage_type = spell_data['damage']['damage_type']['name']
             else:
-                damage_type = None
-                spell_damage = None
-            if spell_data.get('heal_at_slot_level'):
-                healing = list(spell_data['heal_at_slot_level'].values())[0]
-            else:
-                healing = None
-            
-            class_list = ", ".join([cls['name'] for cls in spell_data['classes']])
+                damage_type = "TBD"
+            if 'damage_at_slot_level' in spell_data['damage']:
+                damage_at_slot_level = spell_data['damage']['damage_at_slot_level']
+                spell_damage = list(damage_at_slot_level.values())[0]
+            elif 'damage_at_character_level' in spell_data['damage']:
+                damage_at_character_level = spell_data['damage']['damage_at_character_level']
+                spell_damage = list(damage_at_character_level.values())[0]
+        else:
+            damage_type = None
+            spell_damage = None
+        if spell_data.get('heal_at_slot_level'):
+            healing = list(spell_data['heal_at_slot_level'].values())[0]
+        else:
+            healing = None
+        
+        class_list = ", ".join([cls['name'] for cls in spell_data['classes']])
 
-            
-            school = spell_data['school']['name']        
+        
+        school = spell_data['school']['name']        
 
-            new_spell = Spell(
-                name = spell_data['name'],
-                description = '/n'.join(spell_data['desc']),
-                casting_level = int(spell_data['level']),
-                higher_level = '/n'.join(spell_data['higher_level']),
-                components = ', '.join(spell_data['components']),
-                range = spell_data['range'],
-                material = material,
-                ritual = int(spell_data['ritual']),
-                duration = spell_data['duration'],
-                concentration = int(spell_data['concentration']),
-                casting_time = spell_data['casting_time'],
-                school = school,
-                damage_type = damage_type,
-                damage = spell_damage,
-                healing = healing,
-                classes = class_list
-            )
-            bar()
-            session.add(new_spell)
-        session.commit()
+        new_spell = Spell(
+            name = spell_data['name'],
+            description = '\n\n'.join(spell_data['desc']),
+            casting_level = int(spell_data['level']),
+            higher_level = '\n'.join(spell_data['higher_level']),
+            components = ', '.join(spell_data['components']),
+            range = spell_data['range'],
+            material = material,
+            ritual = int(spell_data['ritual']),
+            duration = spell_data['duration'],
+            concentration = int(spell_data['concentration']),
+            casting_time = spell_data['casting_time'],
+            school = school,
+            damage_type = damage_type,
+            damage = spell_damage,
+            healing = healing,
+            classes = class_list
+        )
+        session.add(new_spell)
+    session.commit()
     print("\nSpells seeded successfully 🌱\n")
 
 
@@ -123,7 +121,7 @@ def populate_character():
             new_character = Character(
                 name = names.human(),
                 level = random.randint(1, 20),
-                user_id = random.randint(1, 125),
+                user_id = random.randint(1, 50),
                 character_class = random.choice(classes)
             )
             bar()
