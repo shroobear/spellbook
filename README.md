@@ -37,6 +37,8 @@ spells that character has learned throughout their campaign. The application als
 
 ## Usage
 
+[Video Walkthrough](https://www.youtube.com/watch?v=O8SaQ69WZVk)
+
 On launch, you'll be presented with the Login screen for the app.
 
 ![Launch Screen](./screenshots/Title-screen.png)
@@ -80,6 +82,30 @@ Selecting any of these will help narrow down your search a little bit.
 Perhaps you accidentally added a spell you didn't want to, or your learned spells have changed upon leveling up. No worries, there is a way to reflect these changes! Within any character's page is an option to "Edit Spells", which will open a prompt for you to easily select which spell to unlearn.
 
 ![Edit Spells](./screenshots/edit-spells.png)
+
+### Viewing Spells
+
+![Acid Splash Spell Page](./screenshots/Spell-page.png)
+
+Just in case there is any confusion, here's a breakdown of what each section on the spell screen is referring to:
+
+| Descriptor | Description |
+| :-- | :--: |
+| Name | The Spell's name |
+| Description | The Spell's Description |
+| Casting Level | The level of spell slot required to cast the spell |
+| Higher Level | What the Spell does if a higher level spell slot is used |
+| Components | Visual, Somatic, or Material components required to cast the spell |
+| Range | The Spell's casting range |
+| Material | Materials required to cast the spell (If any) |
+| Ritual | Denotes whether or not the spell is ritual cast |
+| Duration | How long the spell's effect lasts |
+| Concentration | Denotes whether or not the spell is a concentration spell |
+| Casting Time | Time required to cast the spell |
+| Damage | Type and amount of damage dealt (if any) |
+| Healing | Amount of healing delivered (if any) |
+| Classes | Which classes can learn this spell |
+| School | Which school this spell belongs to |
 
 
 
