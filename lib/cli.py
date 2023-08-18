@@ -89,24 +89,19 @@ def new_user():
     time.sleep(1)
     character_select()
 
-
 def character_select():
+    global current_character
+    current_character = None
     Banner.spellbook()
     print("Characters:\n")
-    characters = []
+    choices = {}
     for character in current_user.characters:
-        characters.append(character.name)
-    choices = characters + ["", "Logout", "Create New Character", "Quit"]
-    selection = Prompt.menu(choices)
-    if selection == "Logout":
-        main()
-    elif selection == "Create New Character":
-        create_character()
-    elif selection == "Quit":
-        quit()
-    else:
-        open_character(selection)
-
+        choices[f'{character.name}'] = lambda: open_character(character.name)
+    choices[""] = ""
+    choices['Logout'] = main
+    choices['Create New Character'] = create_character
+    choices['Quit'] = quit
+    Prompt.dict_menu(choices)
 
 def open_character(character_name):
     global current_character
@@ -227,26 +222,20 @@ def view_spell(spell):
     Banner.generator(query.name)
     print(query)
     clear_screen(2)
+    options = {}
     if current_character:
+        print(f"Current Character: {current_character.name}")
         if spell in get_character_spells():
-            options= {
-                "Forget Spell": lambda: remove_spell(spell),
-                "Return to Spell List": view_all_spells,
-                "Return to Character": lambda: open_character(current_character.name),
-                "Quit": quit
-            }
+            options["Forget Spell"] = lambda: remove_spell(spell)
         else:
-            options = {
-                "Learn Spell": lambda: learn_spell(query),
-                "Return to Spell List": view_all_spells,
-                "Return to Character": lambda: open_character(current_character.name),
-                "Quit": quit
-            }
-    else: options = {
-        "Return to Spell List": view_all_spells,
-        "Home": main,
-        "Quit": quit
-    }
+            options["Learn Spell"] = lambda: learn_spell(query)
+        options['Return to Character'] = lambda: open_character(current_character.name)
+    options["Master Spell List"] = view_all_spells
+    options["Spell Filters"] = filter_spells
+    if not current_character:
+        options["Home"] = main
+    options["Quit"] = quit
+
     Prompt.dict_menu(options)
 
 
